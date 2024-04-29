@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import mysql.connector
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration, WebRtcMode
