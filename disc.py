@@ -1,3 +1,6 @@
+
+
+
 import streamlit as st
 import smtplib
 from email.mime.multipart import MIMEMultipart
@@ -41,6 +44,43 @@ def obter_definicoes_perfil(perfil):
     }
     return definicoes[perfil]
 
+def obter_info_adicional(perfil):
+    informacoes = {
+        "Dominância": {
+            "Combinação de Fatores": "Decisões rápidas, busca por desafios, foco em resultados.",
+            "Principais Características": "Determinado, assertivo, independente.",
+            "Perfil em Equipe e no Trabalho": "Prefere liderar, tomar decisões e resolver problemas.",
+            "Motivadores": "Resultados, metas claras, liberdade de ação.",
+            "Pontos Limitantes": "Tendência a ser impaciente ou autoritário em certas situações.",
+            "Oportunidades de Desenvolvimento": "Desenvolver paciência e melhorar a escuta ativa."
+        },
+        "Influência": {
+            "Combinação de Fatores": "Facilidade de comunicação, desejo de influenciar e interagir.",
+            "Principais Características": "Comunicativo, persuasivo, sociável.",
+            "Perfil em Equipe e no Trabalho": "Trabalha bem em equipe e motiva os outros ao seu redor.",
+            "Motivadores": "Reconhecimento, interação social, ambiente positivo.",
+            "Pontos Limitantes": "Tendência a perder o foco ou evitar conflitos.",
+            "Oportunidades de Desenvolvimento": "Aprender a lidar com críticas e desenvolver foco em resultados."
+        },
+        "Estabilidade": {
+            "Combinação de Fatores": "Desejo por harmonia e consistência em ambientes tranquilos.",
+            "Principais Características": "Paciente, confiável, persistente.",
+            "Perfil em Equipe e no Trabalho": "Oferece suporte, mantém a estabilidade e evita conflitos.",
+            "Motivadores": "Ambientes estáveis, segurança e relacionamentos de confiança.",
+            "Pontos Limitantes": "Resistência a mudanças rápidas ou inesperadas.",
+            "Oportunidades de Desenvolvimento": "Trabalhar a adaptabilidade e assumir mais riscos calculados."
+        },
+        "Conformidade": {
+            "Combinação de Fatores": "Atenção aos detalhes, foco em qualidade e seguir normas.",
+            "Principais Características": "Detalhista, organizado, preciso.",
+            "Perfil em Equipe e no Trabalho": "Prefere seguir regras, garantindo qualidade e conformidade.",
+            "Motivadores": "Padrões claros, regras definidas e segurança.",
+            "Pontos Limitantes": "Excesso de crítica a si mesmo ou aos outros, dificuldade em lidar com incertezas.",
+            "Oportunidades de Desenvolvimento": "Desenvolver flexibilidade e lidar melhor com situações ambíguas."
+        }
+    }
+    return informacoes[perfil]
+
 def teste_disc():
     st.title("Teste DISC")
 
@@ -51,6 +91,7 @@ def teste_disc():
     # Perguntas do teste
     respostas = []
     perguntas = [
+     
         ("Eu gosto de desafios e me sinto confortável ao tomar decisões rápidas.", "dominancia"),
         ("Eu sou uma pessoa extrovertida e gosto de conversar e influenciar outras pessoas.", "influencia"),
         ("Eu prefiro ambientes estáveis e com menos mudanças repentinas.", "estabilidade"),
@@ -81,7 +122,7 @@ def teste_disc():
         ("Eu me adapto bem a mudanças sociais.", "influencia")
     ]
 
-    # Loop pelas perguntas, mostrando apenas o texto da pergunta
+    # Loop pelas perguntas
     for pergunta, perfil in perguntas:
         resposta = st.radio(pergunta, ['Discordo totalmente', 'Discordo', 'Concordo', 'Concordo totalmente'])
         respostas.append(resposta)
@@ -105,10 +146,15 @@ def teste_disc():
         perfil_predominante = max(perfis, key=perfis.get)
         st.write(f"Seu perfil comportamental predominante é: {perfil_predominante}")
 
-        # Obter a definição e área de trabalho sugerida para o perfil predominante
+        # Obter a definição e áreas sugeridas
         definicao, areas_sugeridas = obter_definicoes_perfil(perfil_predominante)
         st.write(f"**Definição do perfil {perfil_predominante}:** {definicao}")
         st.write(f"**Sugestão de áreas de trabalho:** {areas_sugeridas}")
+
+        # Obter informações adicionais do perfil
+        info_adicional = obter_info_adicional(perfil_predominante)
+        for chave, valor in info_adicional.items():
+            st.write(f"**{chave}:** {valor}")
 
         # Enviar resultado por e-mail se o campo de e-mail estiver preenchido
         if email:
@@ -125,6 +171,14 @@ def teste_disc():
                         <li>Influência: {influencia}</li>
                         <li>Estabilidade: {estabilidade}</li>
                         <li>Conformidade: {conformidade}</li>
+                    </ul>
+                    <p><strong>Informações adicionais:</strong></p>
+                    <ul>
+            """
+            for chave, valor in info_adicional.items():
+                corpo_email += f"<li><strong>{chave}:</strong> {valor}</li>"
+
+            corpo_email += """
                     </ul>
                 </body>
             </html>
