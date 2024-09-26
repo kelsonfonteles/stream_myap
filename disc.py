@@ -1,9 +1,10 @@
+
+
+
 import streamlit as st
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import psycopg2
-from psycopg2 import sql
 
 # Configurações do servidor SMTP do Gmail
 smtp_server = 'smtp.gmail.com'
@@ -11,7 +12,6 @@ smtp_port = 587
 gmail_user = 'dataresender@gmail.com'
 gmail_password = 'mdzdcqyclzuhnpan'
 
-# Função para enviar e-mail
 def enviar_email(destinatario, assunto, corpo):
     msg = MIMEMultipart()
     msg['From'] = gmail_user
@@ -31,36 +31,6 @@ def enviar_email(destinatario, assunto, corpo):
     except Exception as e:
         st.error(f'Erro ao enviar e-mail: {e}')
 
-# Função para inserir os dados no banco de dados
-def inserir_dados_bd(nome, telefone, email, perfil, definicao, areas, combinacao, caracteristicas, perfil_equipe, motivadores, limitantes, desenvolvimento):
-    db_params = {
-        'dbname': 'defaultdb',
-        'user': 'avnadmin',
-        'password': 'AVNS_OV0tPMSnWRwf4C_zqgv',
-        'host': 'pg-1598f41b-aecaged.k.aivencloud.com',
-        'port': 26498  # Porta do banco de dados
-    }
-
-    try:
-        conn = psycopg2.connect(**db_params)
-        cursor = conn.cursor()
-
-        insert_query = sql.SQL("""
-            INSERT INTO trusted_zone.disc 
-            (nome_completo, telefone, email, spcp, dpi, sat, cf, pc, pet, mtv, pl, od) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """)
-
-        cursor.execute(insert_query, (nome, telefone, email, perfil, definicao, areas, combinacao, caracteristicas, perfil_equipe, motivadores, limitantes, desenvolvimento))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-        st.success("Dados inseridos no banco de dados com sucesso!")
-    except Exception as e:
-        st.error(f"Erro ao inserir dados no banco de dados: {e}")
-
-# Função para obter as definições do perfil DISC
 def obter_definicoes_perfil(perfil):
     definicoes = {
         "Dominância": ("Pessoas com alta dominância tendem a ser diretas, objetivas e gostam de ter controle. Elas preferem tomar decisões rápidas e enfrentar desafios.", 
@@ -77,58 +47,52 @@ def obter_definicoes_perfil(perfil):
 def obter_info_adicional(perfil):
     informacoes = {
         "Dominância": {
-            "cf": "Decisões rápidas, busca por desafios, foco em resultados.",
-            "pc": "Determinado, assertivo, independente.",
-            "pet": "Prefere liderar, tomar decisões e resolver problemas.",
-            "mtv": "Resultados, metas claras, liberdade de ação.",
-            "pl": "Tendência a ser impaciente ou autoritário em certas situações.",
-            "od": "Desenvolver paciência e melhorar a escuta ativa."
+            "Combinação de Fatores": "Decisões rápidas, busca por desafios, foco em resultados.",
+            "Principais Características": "Determinado, assertivo, independente.",
+            "Perfil em Equipe e no Trabalho": "Prefere liderar, tomar decisões e resolver problemas.",
+            "Motivadores": "Resultados, metas claras, liberdade de ação.",
+            "Pontos Limitantes": "Tendência a ser impaciente ou autoritário em certas situações.",
+            "Oportunidades de Desenvolvimento": "Desenvolver paciência e melhorar a escuta ativa."
         },
         "Influência": {
-            "cf": "Facilidade de comunicação, desejo de influenciar e interagir.",
-            "pc": "Comunicativo, persuasivo, sociável.",
-            "pet": "Trabalha bem em equipe e motiva os outros ao seu redor.",
-            "mtv": "Reconhecimento, interação social, ambiente positivo.",
-            "pl": "Tendência a perder o foco ou evitar conflitos.",
-            "od": "Aprender a lidar com críticas e desenvolver foco em resultados."
+            "Combinação de Fatores": "Facilidade de comunicação, desejo de influenciar e interagir.",
+            "Principais Características": "Comunicativo, persuasivo, sociável.",
+            "Perfil em Equipe e no Trabalho": "Trabalha bem em equipe e motiva os outros ao seu redor.",
+            "Motivadores": "Reconhecimento, interação social, ambiente positivo.",
+            "Pontos Limitantes": "Tendência a perder o foco ou evitar conflitos.",
+            "Oportunidades de Desenvolvimento": "Aprender a lidar com críticas e desenvolver foco em resultados."
         },
         "Estabilidade": {
-            "cf": "Desejo por harmonia e consistência em ambientes tranquilos.",
-            "pc": "Paciente, confiável, persistente.",
-            "pet": "Oferece suporte, mantém a estabilidade e evita conflitos.",
-            "mtv": "Ambientes estáveis, segurança e relacionamentos de confiança.",
-            "pl": "Resistência a mudanças rápidas ou inesperadas.",
-            "od": "Trabalhar a adaptabilidade e assumir mais riscos calculados."
+            "Combinação de Fatores": "Desejo por harmonia e consistência em ambientes tranquilos.",
+            "Principais Características": "Paciente, confiável, persistente.",
+            "Perfil em Equipe e no Trabalho": "Oferece suporte, mantém a estabilidade e evita conflitos.",
+            "Motivadores": "Ambientes estáveis, segurança e relacionamentos de confiança.",
+            "Pontos Limitantes": "Resistência a mudanças rápidas ou inesperadas.",
+            "Oportunidades de Desenvolvimento": "Trabalhar a adaptabilidade e assumir mais riscos calculados."
         },
         "Conformidade": {
-            "cf": "Atenção aos detalhes, foco em qualidade e seguir normas.",
-            "pc": "Detalhista, organizado, preciso.",
-            "pet": "Prefere seguir regras, garantindo qualidade e conformidade.",
-            "mtv": "Padrões claros, regras definidas e segurança.",
-            "pl": "Excesso de crítica a si mesmo ou aos outros, dificuldade em lidar com incertezas.",
-            "od": "Desenvolver flexibilidade e lidar melhor com situações ambíguas."
+            "Combinação de Fatores": "Atenção aos detalhes, foco em qualidade e seguir normas.",
+            "Principais Características": "Detalhista, organizado, preciso.",
+            "Perfil em Equipe e no Trabalho": "Prefere seguir regras, garantindo qualidade e conformidade.",
+            "Motivadores": "Padrões claros, regras definidas e segurança.",
+            "Pontos Limitantes": "Excesso de crítica a si mesmo ou aos outros, dificuldade em lidar com incertezas.",
+            "Oportunidades de Desenvolvimento": "Desenvolver flexibilidade e lidar melhor com situações ambíguas."
         }
     }
     return informacoes[perfil]
 
-# Função principal do teste DISC
 def teste_disc():
     st.title("Teste DISC")
 
-    # Formulário para inserir os dados do usuário
-    st.write("Por favor, preencha o formulário abaixo.")
-    nome_completo = st.text_input("Nome Completo")
-    telefone = st.text_input("Telefone Whatsapp", placeholder="(xx)xxxxx-xxxx")
-    email = st.text_input("Email")
+    # Formulário para inserir o e-mail
+    st.write("Por favor, preencha o formulário abaixo com seu e-mail para receber o resultado.")
+    email = st.text_input("Digite seu e-mail para receber o resultado:")
 
-    if not nome_completo or not telefone or not email:
-        st.warning("Por favor, preencha todos os campos.")
-        return
-
-    # Perguntas do teste DISC
+    # Perguntas do teste
     respostas = []
     perguntas = [
-    ("Eu gosto de desafios e me sinto confortável ao tomar decisões rápidas.", "dominancia"),
+     
+        ("Eu gosto de desafios e me sinto confortável ao tomar decisões rápidas.", "dominancia"),
         ("Eu sou uma pessoa extrovertida e gosto de conversar e influenciar outras pessoas.", "influencia"),
         ("Eu prefiro ambientes estáveis e com menos mudanças repentinas.", "estabilidade"),
         ("Eu sou uma pessoa analítica e gosto de seguir regras e procedimentos.", "conformidade"),
@@ -170,6 +134,7 @@ def teste_disc():
         estabilidade = respostas.count('Discordo')
         conformidade = respostas.count('Discordo totalmente')
 
+        # Cria um dicionário com as pontuações dos perfis
         perfis = {
             "Dominância": dominancia,
             "Influência": influencia,
@@ -177,40 +142,48 @@ def teste_disc():
             "Conformidade": conformidade
         }
 
+        # Exibir o perfil com a maior pontuação
         perfil_predominante = max(perfis, key=perfis.get)
         st.write(f"Seu perfil comportamental predominante é: {perfil_predominante}")
 
+        # Obter a definição e áreas sugeridas
         definicao, areas_sugeridas = obter_definicoes_perfil(perfil_predominante)
-        info_adicional = obter_info_adicional(perfil_predominante)
-
         st.write(f"**Definição do perfil {perfil_predominante}:** {definicao}")
         st.write(f"**Sugestão de áreas de trabalho:** {areas_sugeridas}")
-        st.write(f"**Combinação de Fatores:** {info_adicional['cf']}")
-        st.write(f"**Principais Características:** {info_adicional['pc']}")
-        st.write(f"**Perfil em Equipe e no Trabalho:** {info_adicional['pet']}")
-        st.write(f"**Motivadores:** {info_adicional['mtv']}")
-        st.write(f"**Pontos Limitantes:** {info_adicional['pl']}")
-        st.write(f"**Oportunidades de Desenvolvimento:** {info_adicional['od']}")
 
-        # Enviar e-mail com o resultado
-        corpo_email = f"""
-        <p>Olá {nome_completo},</p>
-        <p>Seu perfil comportamental predominante é: <strong>{perfil_predominante}</strong></p>
-        <p><strong>Definição do perfil {perfil_predominante}:</strong> {definicao}</p>
-        <p><strong>Sugestão de áreas de trabalho:</strong> {areas_sugeridas}</p>
-        <p><strong>Combinação de Fatores:</strong> {info_adicional['cf']}</p>
-        <p><strong>Principais Características:</strong> {info_adicional['pc']}</p>
-        <p><strong>Perfil em Equipe e no Trabalho:</strong> {info_adicional['pet']}</p>
-        <p><strong>Motivadores:</strong> {info_adicional['mtv']}</p>
-        <p><strong>Pontos Limitantes:</strong> {info_adicional['pl']}</p>
-        <p><strong>Oportunidades de Desenvolvimento:</strong> {info_adicional['od']}</p>
-        """
-        enviar_email(email, "Resultado do Teste DISC", corpo_email)
+        # Obter informações adicionais do perfil
+        info_adicional = obter_info_adicional(perfil_predominante)
+        for chave, valor in info_adicional.items():
+            st.write(f"**{chave}:** {valor}")
 
-        # Inserir os dados no banco de dados
-        inserir_dados_bd(nome_completo, telefone, email, perfil_predominante, definicao, areas_sugeridas, 
-                         info_adicional['cf'], info_adicional['pc'], info_adicional['pet'], 
-                         info_adicional['mtv'], info_adicional['pl'], info_adicional['od'])
+        # Enviar resultado por e-mail se o campo de e-mail estiver preenchido
+        if email:
+            corpo_email = f"""
+            <html>
+                <body>
+                    <h2>Resultado do Teste DISC</h2>
+                    <p>Seu perfil comportamental predominante é: <strong>{perfil_predominante}</strong></p>
+                    <p><strong>Definição do perfil {perfil_predominante}:</strong> {definicao}</p>
+                    <p><strong>Sugestão de áreas de trabalho:</strong> {areas_sugeridas}</p>
+                    <p><strong>Pontuações:</strong></p>
+                    <ul>
+                        <li>Dominância: {dominancia}</li>
+                        <li>Influência: {influencia}</li>
+                        <li>Estabilidade: {estabilidade}</li>
+                        <li>Conformidade: {conformidade}</li>
+                    </ul>
+                    <p><strong>Informações adicionais:</strong></p>
+                    <ul>
+            """
+            for chave, valor in info_adicional.items():
+                corpo_email += f"<li><strong>{chave}:</strong> {valor}</li>"
+
+            corpo_email += """
+                    </ul>
+                </body>
+            </html>
+            """
+            enviar_email(email, "Resultado do Teste DISC", corpo_email)
 
 if __name__ == "__main__":
     teste_disc()
