@@ -38,6 +38,7 @@ def inserir_dados_bd(nome, telefone, email, perfil, definicao, areas, combinacao
         'user': 'avnadmin',
         'password': 'AVNS_OV0tPMSnWRwf4C_zqgv',
         'host': 'pg-1598f41b-aecaged.k.aivencloud.com'
+        'port': 26498  # Porta do banco de dados
     }
 
     try:
